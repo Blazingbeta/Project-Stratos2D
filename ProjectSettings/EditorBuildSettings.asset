@@ -4,4 +4,13 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/2DCharacter/LevelSelect.unity
+    guid: f8ce07fe9d5830d49b1e26d53aceafc2
+  - enabled: 1
+    path: Assets/2DCharacter/PlatformerDebug.unity
+    guid: 237c7718a5992b1409506b70c72c144f
+  - enabled: 1
+    path: Assets/2DLevelEditor/LevelEditor.unity
+    guid: 328abe1e4f006b44f9e97ce45e9b8d34

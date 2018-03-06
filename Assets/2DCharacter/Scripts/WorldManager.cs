@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 namespace Character2D
 {
 	public class WorldManager : MonoBehaviour
@@ -8,9 +9,11 @@ namespace Character2D
 		GameObject m_enviroment;
 		GameObject[] m_worldObjects;
 		GameObject[] m_placeables;
+
 		private void Start()
 		{
-			LoadMap("Test.lvl");
+			
+			LoadMap(LevelSelect.levelFilePath);
 		}
 		private void LoadMap(string path)
 		{

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 namespace LevelEditor2D
 {
@@ -67,6 +68,10 @@ namespace LevelEditor2D
 		public static GameObject GetCurrentObject()
 		{
 			return m_placeables[m_currentSelectedIndex];
+		}
+		public void ExitEditor()
+		{
+			SceneManager.LoadScene("LevelSelect");
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 /// <summary>
 /// The logic, functionality, and state machine behind the players movement system.
 /// Primary states are listed in EMovementState, Substates such as state transitions are their own IENumerable functions that are run on Coroutine
@@ -77,7 +78,7 @@ namespace Character2D
 		{
 			if (collision.CompareTag("FinishFlag"))
 			{
-				Destroy(collision.gameObject);
+				SceneManager.LoadScene("LevelSelect");
 			}
 		}
 		#region MoveStates

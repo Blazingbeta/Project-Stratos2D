@@ -44,6 +44,7 @@ namespace LevelEditor2D
 		public void SaveLevel()
 		{
 			if (m_levelNameField.text.Length == 0) return;
+			string filePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
 			LevelData levelData = new LevelData();
 			List<IntVec2> positions = new List<IntVec2>(m_currentGrid.Keys);
 			levelData.m_grid = new GridObject[positions.Count];
@@ -55,7 +56,8 @@ namespace LevelEditor2D
 					m_x = positions[j].x, m_y = positions[j].y, m_objID = objId
 				};
 			}
-			string filePath = m_levelNameField.text + ".lvl";
+			filePath += "\\ProjectStratos\\2D\\" + m_levelNameField.text + ".lvl";
+			Debug.Log(filePath);
 			LevelData.SaveGrid(levelData, filePath);
 		}
 	}
