@@ -73,7 +73,13 @@ namespace Character2D
 			m_moveAccel = (float)System.Math.Truncate(m_moveAccel * 1000.0f)/1000.0f;
 			transform.position += Vector3.right * m_moveAccel * Time.deltaTime;
 		}
-
+		private void OnTriggerEnter2D(Collider2D collision)
+		{
+			if (collision.CompareTag("FinishFlag"))
+			{
+				Destroy(collision.gameObject);
+			}
+		}
 		#region MoveStates
 		///The primary states of movement with the logic on when to go to other states.
 		///Make sure all of these have a coresponding EMovementState and are added to the dictionary.

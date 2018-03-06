@@ -14,18 +14,24 @@ namespace LevelEditor2D
 		[SerializeField] Image m_selectionImage;
 		private Transform m_currentSelectedButton;
 
-
 		static GameObject[] m_placeables;
 		private static int m_currentSelectedIndex;
 		private void Start()
 		{
+			ImportPlaceables();
+			SelectionButtonPressed("Floor");
+		}
+		private void ImportPlaceables()
+		{
 			Object[] resourceObjs = Resources.LoadAll("LevelObjects/", typeof(GameObject));
+			GameObject[] gameObjs = new GameObject[resourceObjs.Length];
 			m_placeables = new GameObject[resourceObjs.Length];
 			for (int j = 0; j < m_placeables.Length; j++)
 			{
-				m_placeables[j] = (GameObject)resourceObjs[j];
+				gameObjs[j] = (GameObject)resourceObjs[j];
+				//sort placeables by their object id's
+				m_placeables[gameObjs[j].GetComponent<ObjectInfo>().m_objectID] = gameObjs[j];
 			}
-			SelectionButtonPressed("Floor");
 		}
 		void Update()
 		{

@@ -8,6 +8,9 @@ namespace LevelEditor2D
 	{
 		//[SerializeField] GameObject m_currentObject;
 		private Dictionary<IntVec2, GameObject> m_currentGrid = new Dictionary<IntVec2, GameObject>();
+
+		[SerializeField] UnityEngine.UI.InputField m_levelNameField;
+
 		void Update()
 		{
 			if (EditorMenu.m_menuOpen) return;
@@ -37,6 +40,23 @@ namespace LevelEditor2D
 				output.y = y;
 				return output;
 			}
+		}
+		public void SaveLevel()
+		{
+			if (m_levelNameField.text.Length == 0) return;
+			LevelData levelData = new LevelData();
+			List<IntVec2> positions = new List<IntVec2>(m_currentGrid.Keys);
+			levelData.m_grid = new GridObject[positions.Count];
+			for(int j = 0; j < positions.Count; j++)
+			{
+				int objId = m_currentGrid[positions[j]].GetComponent<ObjectInfo>().m_objectID;
+				levelData.m_grid[j] = new GridObject
+				{
+					m_x = positions[j].x, m_y = positions[j].y, m_objID = objId
+				};
+			}
+			string filePath = m_levelNameField.text + ".lvl";
+			LevelData.SaveGrid(levelData, filePath);
 		}
 	}
 }

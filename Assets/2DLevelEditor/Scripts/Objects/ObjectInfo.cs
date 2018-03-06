@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public struct GridObject
-{
-	public int m_x, m_y, m_objID;
+public class ObjectInfo : MonoBehaviour {
+	public int m_objectID;
+
 }
