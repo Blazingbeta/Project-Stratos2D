@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class LevelSelect : MonoBehaviour {
 	Dropdown m_levelSelector;
 	string[] levels;
-	public static string levelFilePath;
+	public static string levelFilePath = "default.lvl";
 	// Use this for initialization
 	private void Start()
 	{

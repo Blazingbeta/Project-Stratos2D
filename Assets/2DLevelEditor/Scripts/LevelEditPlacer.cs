@@ -16,10 +16,7 @@ namespace LevelEditor2D
 			if (EditorMenu.m_menuOpen) return;
 			if (Input.GetMouseButton(0))
 			{
-				Vector3 clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-				IntVec2 roundedPos;
-				roundedPos.x = Mathf.RoundToInt(clickPos.x);
-				roundedPos.y = Mathf.RoundToInt(clickPos.y);
+				IntVec2 roundedPos = GetClickPos();
 				if (!m_currentGrid.ContainsKey(roundedPos))
 				{
 					Vector3 spawnPos = roundedPos.ToVec2();
@@ -27,6 +24,23 @@ namespace LevelEditor2D
 					m_currentGrid.Add(roundedPos, newObj);
 				}
 			}
+			else if (Input.GetMouseButton(1))
+			{
+				IntVec2 roundedPos = GetClickPos();
+				if (m_currentGrid.ContainsKey(roundedPos))
+				{
+					Destroy(m_currentGrid[roundedPos]);
+					m_currentGrid.Remove(roundedPos);
+				}
+			}
+		}
+		private IntVec2 GetClickPos()
+		{
+			Vector3 clickPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			IntVec2 roundedPos;
+			roundedPos.x = Mathf.RoundToInt(clickPos.x);
+			roundedPos.y = Mathf.RoundToInt(clickPos.y);
+			return roundedPos;
 		}
 		[System.Serializable]
 		public struct IntVec2
