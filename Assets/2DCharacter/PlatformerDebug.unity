@@ -183,7 +183,10 @@ MonoBehaviour:
   m_idleDrag: 0.4
   m_airControlPercent: 0.3
   m_wallslideGravityMod: 0.6
-  m_raycastExtension: -0.2
+  m_feetPosition: {x: 0, y: -0.6, z: 0}
+  m_headPosition: {x: 0, y: 0.5, z: 0}
+  m_xRaycastDistance: 0.372
+  m_yRaycastDistance: 0.312
   m_landMask:
     serializedVersion: 2
     m_Bits: 768
@@ -303,7 +306,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 3
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

@@ -30,11 +30,12 @@ namespace Character2D
 		[SerializeField] [Range(0.0f, 0.5f)] private float m_idleDrag = 0.01f;
 		[SerializeField] [Range(0.0f, 1.0f)] private float m_airControlPercent = 0.8f;
 		[SerializeField] [Range(0.0f, 1.0f)] private float m_wallslideGravityMod = 0.2f;
-		[SerializeField] [Range(-0.5f, 0.5f)] private float m_raycastExtension = 0.0f;
+		[SerializeField] private Vector3 m_feetPosition, m_headPosition;
+		[SerializeField] [Range(0.0f, 1.0f)] private float m_xRaycastDistance = 1.0f, m_yRaycastDistance = 1.0f;
 		[SerializeField] private LayerMask m_landMask = 0, m_wallslideMask = 0;
 
 		//Private Storage
-		private Vector3 m_hitboxCenterOffset;
+		//private Vector3 m_hitboxCenterOffset;
 		private float m_moveAccel = 0.0f;
 		private bool m_inSubState = false;
 		private bool m_isSprinting = false;
@@ -43,7 +44,7 @@ namespace Character2D
 
 		//Components
 		Rigidbody2D m_rb;
-		BoxCollider2D m_hitbox;
+		//BoxCollider2D m_hitbox;
 		private void Awake()
 		{
 			m_moveStates.Add(EMovementState.Idle, IdleState);
@@ -55,8 +56,8 @@ namespace Character2D
 		private void Start()
 		{
 			m_rb = GetComponent<Rigidbody2D>();
-			m_hitbox = GetComponent<BoxCollider2D>();
-			m_hitboxCenterOffset = m_hitbox.offset;
+			//m_hitbox = GetComponent<BoxCollider2D>();
+			//m_hitboxCenterOffset = m_hitbox.offset;
 		}
 		private void Update()
 		{
@@ -97,6 +98,15 @@ namespace Character2D
 				StartCoroutine(SubstateMoveStartup());
 			}
 		}
+		private bool GroundBelow()
+		{
+			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition, Vector2.down, m_yRaycastDistance, m_landMask);
+			if (hit.collider)
+			{
+				return true;
+			}
+			return false;
+		}
 		/// <summary>
 		/// Walking or Running
 		/// </summary>
@@ -109,21 +119,32 @@ namespace Character2D
 			{
 				StartCoroutine(SubstateMoveStop());
 			}
-			if (Input.GetButtonDown("Jump"))
+			else if (Input.GetButtonDown("Jump"))
 			{
 				StartCoroutine(SubstateJump());
 			}
+			else if (!GroundBelow())
+			{
+				//TODO MAKE STATE HERE
+			}
 		}
 		/// <summary>
-		/// Raycasts for a wall and stop movement if you collide with one
+		/// Raycasts for a wall and stop movement if you collide with one either at feet or head position
 		/// </summary>
 		/// <returns>Returns true if movement was stopped.</returns>
 		private bool WallCollide()
 		{
 			int directionMod = (m_moveAccel > 0 ? 1 : m_moveAccel < 0 ? -1 : 0);
 			if (directionMod == 0) return false;
-			Debug.DrawLine(transform.position + m_hitboxCenterOffset + Vector3.back, (Vector3.right * directionMod * (m_hitbox.size.x + m_raycastExtension)) + transform.position + m_hitboxCenterOffset + Vector3.back, Color.red);
-			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_hitboxCenterOffset, Vector2.right * directionMod, m_hitbox.size.x + m_raycastExtension, m_wallslideMask);
+			Debug.DrawLine(transform.position + m_feetPosition + Vector3.back, (Vector3.right * directionMod * m_xRaycastDistance) + transform.position + m_feetPosition + Vector3.back, Color.red);
+			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition, Vector2.right * directionMod, m_xRaycastDistance, m_wallslideMask);
+			if (hit.collider)
+			{
+				m_moveAccel = 0.0f;
+				return true;
+			}
+			Debug.DrawLine(transform.position + m_headPosition + Vector3.back, (Vector3.right * directionMod * m_xRaycastDistance) + transform.position + m_headPosition + Vector3.back, Color.red);
+			hit = Physics2D.Raycast(transform.position + m_headPosition, Vector2.right * directionMod, m_xRaycastDistance, m_wallslideMask);
 			if (hit.collider)
 			{
 				m_moveAccel = 0.0f;
@@ -150,9 +171,9 @@ namespace Character2D
 			{
 				m_holdJump = false;
 				m_rb.gravityScale = m_fallingGravityMod;
-				///Does a raycast from the center of your hitbox to the edge of the hitbox + m_raycastExtension. Incrase m_raycastExtension if collisions dont always work
-				RaycastHit2D hit = Physics2D.Raycast(transform.position+m_hitboxCenterOffset, Vector2.down, m_hitbox.size.y+m_raycastExtension, m_landMask);
-				if (hit.collider)
+				///Does a raycast from the center of your hitbox to the edge of the hitbox + m_raycastDistance. Incrase m_raycastDistance if collisions dont always work
+				//RaycastHit2D hit = Physics2D.Raycast(transform.position+m_feetPosition, Vector2.down, m_yRaycastDistance, m_landMask);
+				if (GroundBelow())
 				{
 					m_rb.gravityScale = 1.0f;
 					StartCoroutine(SubstateLand());
@@ -161,11 +182,17 @@ namespace Character2D
 		}
 		private bool ShouldWallslide()
 		{
-			///Does a raycast from the center of your hitbox to the edge of the hitbox + m_raycastExtension. Incrase m_raycastExtension if collisions dont always work
+			///Does a raycast from the center of your hitbox to the edge of the hitbox + m_raycastDistance. Incrase m_raycastDistance if collisions dont always work
 			int directionMod = (m_moveAccel > 0 ? 1 : m_moveAccel < 0 ? -1 : 0);
 			if (directionMod == 0) return false;
-			Debug.DrawLine(transform.position + m_hitboxCenterOffset + Vector3.back, (Vector3.right * directionMod * (m_hitbox.size.x + m_raycastExtension)) + transform.position + m_hitboxCenterOffset + Vector3.back, Color.blue);
-			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_hitboxCenterOffset, Vector2.right*directionMod, m_hitbox.size.x + m_raycastExtension, m_wallslideMask);
+			Debug.DrawLine(transform.position + m_feetPosition + Vector3.back, (Vector3.right * directionMod * m_xRaycastDistance) + transform.position + m_feetPosition + Vector3.back, Color.red);
+			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition, Vector2.right * directionMod, m_xRaycastDistance, m_wallslideMask);
+			if (hit.collider)
+			{
+				return true;
+			}
+			Debug.DrawLine(transform.position + m_headPosition + Vector3.back, (Vector3.right * directionMod * m_xRaycastDistance) + transform.position + m_headPosition + Vector3.back, Color.red);
+			hit = Physics2D.Raycast(transform.position + m_headPosition, Vector2.right * directionMod, m_xRaycastDistance, m_wallslideMask);
 			if (hit.collider)
 			{
 				return true;
@@ -184,10 +211,11 @@ namespace Character2D
 			{
 				StartCoroutine(SubstateWallJump());
 			}
-			else
+			else if(m_rb.velocity.y <= 0)
 			{
-				RaycastHit2D hit = Physics2D.Raycast(transform.position + m_hitboxCenterOffset, Vector2.down, m_hitbox.size.y + m_raycastExtension, m_landMask);
-				if (hit.collider)
+				//only runs if the player is sliding down not up
+				//RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition, Vector2.down, m_yRaycastDistance, m_landMask);
+				if (GroundBelow())
 				{
 					m_rb.gravityScale = 1.0f;
 					StartCoroutine(SubstateLand());
