@@ -22,6 +22,13 @@ public class LevelSelect : MonoBehaviour {
 		}
 		m_levelSelector.AddOptions(condencedLevelNames);
 	}
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			Application.Quit();
+		}
+	}
 	public void RunLevel()
 	{
 		levelFilePath = levels[m_levelSelector.value];

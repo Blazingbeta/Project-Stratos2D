@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 33181e0e68d938f4e91d31dabb158763
+timeCreated: 1520616608
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Fontleroy Brown NF
+  fontNames:
+  - Fontleroy Brown NF
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

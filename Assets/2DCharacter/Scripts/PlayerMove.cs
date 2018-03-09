@@ -382,7 +382,8 @@ namespace Character2D
 			transform.GetChild(0).gameObject.SetActive(false);
 			GameObject particle = (GameObject)Resources.Load("Particles/DieParticle");
 			Instantiate(particle, transform.position+Vector3.back*3, Quaternion.identity);
-			yield return null;
+			yield return new WaitForSeconds(0.4f);
+			GameObject.Find("Canvas").transform.GetChild(0).gameObject.SetActive(true);
 			m_state = EMovementState.Dead;
 			m_inSubState = false;
 		}
