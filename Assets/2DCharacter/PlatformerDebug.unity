@@ -176,17 +176,19 @@ MonoBehaviour:
   m_jumpHeight: 5
   m_fallingGravityMod: 1.5
   m_jumpHoldForce: 2
-  m_walljumpForce: 15
-  m_walljumpDirection: {x: 1, y: 1}
+  m_walljumpForce: 10
+  m_walljumpDirection: {x: 1.4, y: 1}
   m_groundDrag: 0.2
   m_airDrag: 0.06
   m_idleDrag: 0.4
   m_airControlPercent: 0.3
-  m_wallslideGravityMod: 0.6
+  m_walljumpAirControlMod: 0.1
+  m_wallslideGravityMod: 0.4
   m_feetPosition: {x: 0, y: -0.6, z: 0}
   m_headPosition: {x: 0, y: 0.5, z: 0}
   m_xRaycastDistance: 0.372
   m_yRaycastDistance: 0.312
+  m_feetXOffset: 0.2
   m_landMask:
     serializedVersion: 2
     m_Bits: 768
@@ -306,7 +308,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

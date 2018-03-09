@@ -29,9 +29,10 @@ namespace Character2D
 		[SerializeField] [Range(0.0f, 0.5f)] private float m_airDrag = 0.01f;
 		[SerializeField] [Range(0.0f, 0.5f)] private float m_idleDrag = 0.01f;
 		[SerializeField] [Range(0.0f, 1.0f)] private float m_airControlPercent = 0.8f;
+		[SerializeField] [Range(0.0f, 1.0f)] private float m_walljumpAirControlMod = 0.4f;
 		[SerializeField] [Range(0.0f, 1.0f)] private float m_wallslideGravityMod = 0.2f;
 		[SerializeField] private Vector3 m_feetPosition, m_headPosition;
-		[SerializeField] [Range(0.0f, 1.0f)] private float m_xRaycastDistance = 1.0f, m_yRaycastDistance = 1.0f;
+		[SerializeField] [Range(0.0f, 1.0f)] private float m_xRaycastDistance = 1.0f, m_yRaycastDistance = 1.0f, m_feetXOffset = 0.1f;
 		[SerializeField] private LayerMask m_landMask = 0, m_wallslideMask = 0;
 
 		//Private Storage
@@ -41,6 +42,7 @@ namespace Character2D
 		private bool m_isSprinting = false;
 		private bool m_holdJump = false;
 		private bool m_slideOnRight = false;
+		private float m_walljumpMod = 1.0f;
 
 		//Components
 		Rigidbody2D m_rb;
@@ -81,6 +83,10 @@ namespace Character2D
 			{
 				SceneManager.LoadScene("LevelSelect");
 			}
+			else if (collision.CompareTag("Lava"))
+			{
+				StartCoroutine(SubstateDie());
+			}
 		}
 		#region MoveStates
 		///The primary states of movement with the logic on when to go to other states.
@@ -97,10 +103,21 @@ namespace Character2D
 			{
 				StartCoroutine(SubstateMoveStartup());
 			}
+			else if (!GroundBelow())
+			{
+				StartCoroutine(SubstateFallOffWall());
+			}
 		}
 		private bool GroundBelow()
 		{
-			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition, Vector2.down, m_yRaycastDistance, m_landMask);
+			Debug.DrawLine(transform.position + m_feetPosition + Vector3.right * m_feetXOffset + Vector3.back, transform.position + m_feetPosition + Vector3.right * m_feetXOffset + Vector3.back + Vector3.down * m_yRaycastDistance, Color.cyan);
+			Debug.DrawLine(transform.position + m_feetPosition - Vector3.right * m_feetXOffset + Vector3.back, transform.position + m_feetPosition - Vector3.right * m_feetXOffset + Vector3.back + Vector3.down * m_yRaycastDistance, Color.cyan);
+			RaycastHit2D hit = Physics2D.Raycast(transform.position + m_feetPosition + (Vector3.right)* m_feetXOffset, Vector2.down, m_yRaycastDistance, m_landMask);
+			if (hit.collider)
+			{
+				return true;
+			}
+			hit = Physics2D.Raycast(transform.position + m_feetPosition - (Vector3.right) * m_feetXOffset, Vector2.down, m_yRaycastDistance, m_landMask);
 			if (hit.collider)
 			{
 				return true;
@@ -125,7 +142,7 @@ namespace Character2D
 			}
 			else if (!GroundBelow())
 			{
-				//TODO MAKE STATE HERE
+				StartCoroutine(SubstateFallOffWall());
 			}
 		}
 		/// <summary>
@@ -160,7 +177,7 @@ namespace Character2D
 				m_holdJump = Input.GetButton("Jump");
 			}
 			m_rb.gravityScale = 1.0f;
-			m_moveAccel += Input.GetAxis("Horizontal") * (m_isSprinting ? m_runSpeed : m_moveSpeed)*m_airControlPercent;
+			m_moveAccel += Input.GetAxis("Horizontal") * (m_isSprinting ? m_runSpeed : m_moveSpeed)*m_airControlPercent*m_walljumpMod;
 			m_moveAccel *= (1 - m_airDrag);
 			if (ShouldWallslide())
 			{
@@ -169,6 +186,7 @@ namespace Character2D
 			}
 			else if (m_rb.velocity.y <= 0)
 			{
+				m_walljumpMod = 1.0f;
 				m_holdJump = false;
 				m_rb.gravityScale = m_fallingGravityMod;
 				///Does a raycast from the center of your hitbox to the edge of the hitbox + m_raycastDistance. Incrase m_raycastDistance if collisions dont always work
@@ -235,7 +253,10 @@ namespace Character2D
 		}
 		private void DeadState()
 		{
-
+			if (Input.GetKeyDown(KeyCode.R))
+			{
+				SceneManager.LoadScene("LevelSelect");
+			}
 		}
 
 		#endregion
@@ -337,7 +358,17 @@ namespace Character2D
 			dir.Normalize();
 			m_rb.AddForce(dir*m_walljumpForce, ForceMode2D.Impulse);
 			yield return new WaitForSeconds(0.1f);
+			m_walljumpMod = m_walljumpAirControlMod;
 			m_state = EMovementState.Airborn;
+			m_inSubState = false;
+		}
+		private IEnumerator SubstateDie()
+		{
+			m_inSubState = true;
+			//Death initial animation logic
+			transform.GetChild(0).gameObject.SetActive(false);
+			yield return null;
+			m_state = EMovementState.Dead;
 			m_inSubState = false;
 		}
 		#endregion
