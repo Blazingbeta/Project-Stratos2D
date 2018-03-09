@@ -81,7 +81,7 @@ namespace Character2D
 		{
 			if (collision.CompareTag("FinishFlag"))
 			{
-				SceneManager.LoadScene("LevelSelect");
+				StartCoroutine(SubstateWin());
 			}
 			else if (collision.CompareTag("Lava"))
 			{
@@ -240,19 +240,32 @@ namespace Character2D
 				}
 			}
 		}
+		/// <summary>
+		/// Makes sure the player is still holding towards the wall, while also making sure there is still a wall to slide on
+		/// </summary>
+		/// <returns></returns>
 		private bool IsHoldingTowardsWall()
 		{
 			if (m_slideOnRight)
 			{
-				return Input.GetAxis("Horizontal") > 0;
+				float tempValue = m_moveAccel;
+				m_moveAccel = 1.0f;
+				bool stillHasWall = ShouldWallslide();
+				m_moveAccel = tempValue;
+				return stillHasWall && Input.GetAxis("Horizontal") > 0;
 			}
 			else
 			{
-				return Input.GetAxis("Horizontal") < 0;
+				float tempValue = m_moveAccel;
+				m_moveAccel = -1.0f;
+				bool stillHasWall = ShouldWallslide();
+				m_moveAccel = tempValue;
+				return stillHasWall && Input.GetAxis("Horizontal") < 0;
 			}
 		}
 		private void DeadState()
 		{
+			m_rb.gravityScale = 0.0f;
 			if (Input.GetKeyDown(KeyCode.R))
 			{
 				SceneManager.LoadScene("LevelSelect");
@@ -367,9 +380,22 @@ namespace Character2D
 			m_inSubState = true;
 			//Death initial animation logic
 			transform.GetChild(0).gameObject.SetActive(false);
+			GameObject particle = (GameObject)Resources.Load("Particles/DieParticle");
+			Instantiate(particle, transform.position+Vector3.back*3, Quaternion.identity);
 			yield return null;
 			m_state = EMovementState.Dead;
 			m_inSubState = false;
+		}
+		private IEnumerator SubstateWin()
+		{
+			m_inSubState = true;
+			//Death initial animation logic
+			m_moveAccel = 0.0f;
+			m_rb.gravityScale = 0.0f;
+			GameObject particle = (GameObject)Resources.Load("Particles/WinParticle");
+			Instantiate(particle, transform.position + Vector3.back * 3, Quaternion.identity);
+			yield return new WaitForSeconds(1.0f);
+			SceneManager.LoadScene("LevelSelect");
 		}
 		#endregion
 	}
